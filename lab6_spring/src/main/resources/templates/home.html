@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Диаграмма</title>
+    <style>
+        canvas {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+
+<table>
+    <thead>
+    <tr>
+        <td style="color:#ff6384">Сериалы</td>
+        <td style="color:#36a2eb">Фильмы</td>
+        <td style="color:#cc65fe">Мультики</td>
+        <td style="color:#ffce56">Аниме</td>
+    </tr>
+    <tr>
+        <td id="serial" th:text="${serialList}"></td>
+        <td id="films"  th:text="${filmsList}"></td>
+        <td id="cartoon"  th:text="${cartoonList}"></td>
+        <td id="anime"  th:text="${animeList}"></td>
+    </tr>
+    </thead>
+    <tbody>
+
+
+    </tbody>
+</table>
+<br><br>
+
+<canvas id="myChart" width="400" height="400"></canvas>
+<script>
+    // Получаем ссылку на элемент canvas
+    var canvas = document.getElementById('myChart');
+    var context = canvas.getContext('2d');
+
+    var serial = Number(document.getElementById('serial').innerText);
+    var films = Number(document.getElementById('films').innerText);
+    var cartoon = Number(document.getElementById('cartoon').innerText);
+    var anime = Number(document.getElementById('anime').innerText);
+    var all = serial + films + cartoon + anime;
+
+    // Значения для столбиков (в процентах)
+    var data = [
+        (serial / all) * 100,
+        (films / all) * 100,
+        (cartoon / all) * 100,
+        (anime / all) * 100
+    ];
+
+    // Цвета для столбиков
+    var colors = ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56'];
+
+    // Ширина и высота столбиков
+    var barWidth = 50;
+    var maxBarHeight = canvas.height - 50;
+
+    // Рисуем столбики
+    for (var i = 0; i < data.length; i++) {
+        var barHeight = (data[i] / 100) * maxBarHeight;
+
+        // Рисуем столбик с закругленными углами
+        context.fillStyle = colors[i];
+        var x = i * (barWidth + 10) + 30;
+        var y = canvas.height - barHeight;
+        var cornerRadius = 10;
+        context.beginPath();
+        context.moveTo(x + cornerRadius, y);
+        context.lineTo(x + barWidth - cornerRadius, y);
+        context.quadraticCurveTo(x + barWidth, y, x + barWidth, y + cornerRadius);
+        context.lineTo(x + barWidth, y + barHeight - cornerRadius);
+        context.quadraticCurveTo(x + barWidth, y + barHeight, x + barWidth - cornerRadius, y + barHeight);
+        context.lineTo(x + cornerRadius, y + barHeight);
+        context.quadraticCurveTo(x, y + barHeight, x, y + barHeight - cornerRadius);
+        context.lineTo(x, y + cornerRadius);
+        context.quadraticCurveTo(x, y, x + cornerRadius, y);
+        context.closePath();
+        context.fill();
+
+        // Рисуем текст с процентным значением над столбиком
+        context.fillStyle = 'Red';
+        context.font = '12px Arial';
+        context.textAlign = 'center';
+        context.fillText(data[i].toFixed(2) + '%', x + barWidth / 2, y - 5);
+    }
+</script>
+</body>
+</html>
